@@ -2,8 +2,10 @@
 import Link from "next/link";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useRouter } from "next/router";
 
 export default function Home() {
+   const router = useRouter();
   const [data,setData] =useState<any[]>([]);
   useEffect(() => {
     const fetchProducts = async () => {
@@ -21,6 +23,14 @@ export default function Home() {
   const handleDelete = async (id:number)=>{
       const {data,error}=await supabase.from('products').delete().eq('id',id);
   }
+   const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Logout failed:", error.message);
+    } else {
+      router.push("/"); // or wherever you want to redirect
+    }
+  }; 
 
   return (
     <main className="p-10">
@@ -30,6 +40,9 @@ export default function Home() {
       <div className="flex h-screen bg-blue-500 justify-center items-center">
         <div className="w-1/2 bg-white rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Product List</h2>
+          <div>
+            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition" onClick={handleLogout}>Logout</button>
+          </div>
           <div className="flex justify-end">
             <Link href="/create">
               <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">

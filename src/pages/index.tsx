@@ -19,7 +19,7 @@ export default function Login() {
 
     const { email, password } = values;
 
-    const { data:authData, error:authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -28,7 +28,37 @@ export default function Login() {
     if (authError) {
       setErrors({ message: authError.message });
     } else {
+      const {
+        data: { user: authUser },
+        error: authError
+      } = await supabase.auth.getUser();
+
+      if (authError || !authUser) {
+        console.error("User not logged in:", authError);
+        return;
+      }
+
+      const {
+        data: user,
+        error: userError
+      } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", authUser.id)
+        .single();
+
+      if (userError || !user) {
+        console.error("Error fetching user role:", userError);
+        return;
+      }
+
+      if (user.role === "admin") {
+        router.push("/adminhome");
+        return;
+      }
+
       router.push("/userhome");
+
     }
     setIsSubmitting(false);
   };

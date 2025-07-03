@@ -10,23 +10,38 @@ export default function Signup(){
         password:""
     });
     const router = useRouter();
-    const handleSubmit = async (e:any)=>{
-        e.preventDefault();
-        const {data,error}= await supabase.auth.signUp({
-            email:values.email,
-            password:values.password,
-            options: {
-        	data: { name: values.name } 
-        }
-    });
-    if(error){
-        console.error("Error in signup",error);
-    }
-    else{ 
-        router.push('/');     
-        }
-        
-    }
+    const handleSubmit = async (e: any) => {
+  e.preventDefault();
+
+  // Step 1: Sign up user to auth.users
+  const { data: signUpData, error } = await supabase.auth.signUp({
+    email: values.email,
+    password: values.password,
+  });
+
+  if (error || !signUpData.user) {
+    console.error("Error in signup:", error);
+    return;
+  }
+
+  // Step 2: Insert into public.users using same ID
+  const userId = signUpData.user.id;
+
+  const { error: insertError } = await supabase.from('users').insert({
+    id: userId, // Important!
+    name: values.name,
+    email: values.email,
+    role: "user"
+  });
+
+  if (insertError) {
+    console.error("Error inserting to public.users:", insertError);
+    return;
+  }
+
+  router.push('/');
+};
+
 
     
     return (

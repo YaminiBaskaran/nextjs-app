@@ -44,13 +44,7 @@ export default function Home() {
           <div>
             <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition" onClick={handleLogout}>Logout</button>
           </div>
-          <div className="flex justify-end">
-            <Link href="/create">
-              <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
-                Create+
-              </button>
-            </Link>
-          </div>
+          
           <table className="min-w-full table-auto border border-spacing-2 border-collapse">
          <thead>
           <tr>
